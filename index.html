@@ -10,9 +10,9 @@
   <div class="app">
     <header>
       <div class="title">Tiny Arcade 🎮</div>
-      <span class="tag">5 mini-games</span>
-      <span class="tag">HTML + JS only</span>
-      <span class="tag">Miley Edition :3</span>
+      <span class="tag">7 mini-games</span>
+      <span class="tag">Saves + Difficulty</span>
+      <button class="secondary" id="wipeSavesBtn" style="margin-left:auto">🧹 Reset All Saves</button>
     </header>
 
     <div class="grid">
@@ -28,17 +28,18 @@
         <section class="game" id="game-reaction" data-key="reaction">
           <h2>Reaction Test ⚡</h2>
           <div class="panel center">
-            <div id="reactStatus" class="hint">Click “Start” then wait for the screen to turn <b style="color:#8bf0b8">green</b>. Click as fast as you can!</div>
+            <div class="flex" style="justify-content:center">
+              <span class="stat">Last: <b id="reactLast">—</b> ms</span>
+              <span class="stat">Best: <b id="reactBest">—</b> ms</span>
+            </div>
             <div class="spacer"></div>
             <div id="reactBox" class="react-box">
               <span id="reactLabel" class="hint">Waiting…</span>
             </div>
             <div class="spacer"></div>
-            <div class="flex center" style="justify-content:center">
-              <button class="primary" id="reactStart">Start</button>
-              <span class="stat">Last: <b id="reactLast">—</b> ms</span>
-              <span class="stat">Best: <b id="reactBest">—</b> ms</span>
-            </div>
+            <div id="reactStatus" class="hint">Click “Start” then wait for green. Click fast!</div>
+            <div class="spacer"></div>
+            <button class="primary" id="reactStart">Start</button>
           </div>
         </section>
 
@@ -51,6 +52,8 @@
             <button class="primary" id="clickBtn">Click!</button>
             <div class="spacer"></div>
             <div class="hint">CPC: <b id="cpc">1</b> · Auto: <b id="auto">0/s</b></div>
+            <div class="spacer"></div>
+            <div class="hint">Autosaves every few seconds. Use Reset for a new run.</div>
           </div>
           <div class="two-col">
             <div class="panel">
@@ -59,11 +62,13 @@
                 <button class="secondary" id="upCpc">+1 per click (Cost: <span id="costCpc">10</span>)</button>
                 <button class="secondary" id="upAuto">+1 per sec (Cost: <span id="costAuto">25</span>)</button>
               </div>
-              <div class="hint">Costs rise by 25% each purchase.</div>
             </div>
             <div class="panel">
-              <h3>Notes</h3>
-              <div class="hint">A super tiny clicker just for cozy tapping. Progress resets with page refresh.</div>
+              <h3>Save</h3>
+              <div class="flex">
+                <button class="secondary" id="clickerSave">💾 Save now</button>
+                <button class="secondary" id="clickerNew">🗑️ New Game</button>
+              </div>
             </div>
           </div>
         </section>
@@ -75,11 +80,12 @@
             <div class="flex" style="justify-content:center">
               <span class="stat">Moves: <b id="memMoves">0</b></span>
               <span class="stat">Matches: <b id="memMatches">0</b>/8</span>
+              <span class="stat">Best (fewer is better): <b id="memBest">—</b></span>
             </div>
             <div class="spacer"></div>
             <div class="board" id="memBoard"></div>
             <div class="spacer"></div>
-            <div class="hint">Match all pairs! (2×4 or 4×4 configurable in code)</div>
+            <div class="hint">Match all pairs! Best score auto-saves.</div>
           </div>
         </section>
 
@@ -90,11 +96,19 @@
             <div class="flex" style="justify-content:center">
               <span class="stat">Score: <b id="catchScore">0</b></span>
               <span class="stat">Lives: <b id="catchLives">3</b></span>
+              <span class="stat">Best: <b id="catchBest">—</b></span>
+              <label class="stat">Difficulty:
+                <select id="catchDiff">
+                  <option value="easy">Easy</option>
+                  <option value="normal">Normal</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </label>
             </div>
             <div class="spacer"></div>
             <canvas id="catchCanvas" width="680" height="360"></canvas>
             <div class="spacer"></div>
-            <div class="hint">Move with ◀ ▶ (or A/D). Miss three times and it’s over!</div>
+            <div class="hint">Move with ◀ ▶ (or A/D). Miss three times and it’s over! Difficulty & best score save.</div>
           </div>
         </section>
 
@@ -118,34 +132,52 @@
         </section>
 
         <!-- Pong -->
-<section class="game" id="game-pong" data-key="pong">
-  <h2>Pong 🏓</h2>
-  <div class="panel center">
-    <div class="flex" style="justify-content:center">
-      <span class="stat">You: <b id="pongLeft">0</b></span>
-      <span class="stat">CPU: <b id="pongRight">0</b></span>
-    </div>
-    <div class="spacer"></div>
-    <!-- canvas is injected here by pong.js -->
-    <div class="spacer"></div>
-    <div class="hint" id="pongHint">Use W/S or ↑/↓ to move</div>
-  </div>
-</section>
+        <section class="game" id="game-pong" data-key="pong">
+          <h2>Pong 🏓</h2>
+          <div class="panel center">
+            <div class="flex" style="justify-content:center">
+              <span class="stat">You: <b id="pongLeft">0</b></span>
+              <span class="stat">CPU: <b id="pongRight">0</b></span>
+              <label class="stat">Difficulty:
+                <select id="pongDiff">
+                  <option value="easy">Easy</option>
+                  <option value="normal">Normal</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </label>
+              <span class="stat">Cumulative You: <b id="pongCumYou">0</b></span>
+              <span class="stat">Cumulative CPU: <b id="pongCumCpu">0</b></span>
+            </div>
+            <div class="spacer"></div>
+            <!-- canvas injected here -->
+            <div class="spacer"></div>
+            <div class="hint" id="pongHint">Use W/S or ↑/↓ to move. Difficulty & stats save.</div>
+          </div>
+        </section>
 
-<!-- Maze Runner -->
-<section class="game" id="game-maze" data-key="maze">
-  <h2>Maze Runner 🧭</h2>
-  <div class="panel center">
-    <div class="flex" style="justify-content:center">
-      <span class="stat">Moves: <b id="mazeMoves">0</b></span>
-      <span class="stat">Size: <b id="mazeSize">—</b></span>
-    </div>
-    <div class="spacer"></div>
-    <!-- canvas is injected here by maze.js -->
-    <div class="spacer"></div>
-    <div class="hint">Use WASD or arrow keys to find the exit (green square).</div>
-  </div>
-</section>
+        <!-- Maze Runner -->
+        <section class="game" id="game-maze" data-key="maze">
+          <h2>Maze Runner 🧭</h2>
+          <div class="panel center">
+            <div class="flex" style="justify-content:center">
+              <label class="stat">Size:
+                <select id="mazeSizeSel">
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                </select>
+              </label>
+              <span class="stat">Moves: <b id="mazeMoves">0</b></span>
+              <span class="stat">Best (for size): <b id="mazeBest">—</b></span>
+              <span class="stat">Grid: <b id="mazeSize">—</b></span>
+            </div>
+            <div class="spacer"></div>
+            <!-- canvas injected here -->
+            <div class="spacer"></div>
+            <div class="hint">Use WASD or arrow keys to reach the green exit. Best moves save per size.</div>
+          </div>
+        </section>
+
       </main>
     </div>
   </div>
@@ -153,4 +185,3 @@
   <script type="module" src="./main.js"></script>
 </body>
 </html>
-
