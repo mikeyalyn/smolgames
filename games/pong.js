@@ -1,3 +1,5 @@
+import { load, save } from '../utils/store.js';
+
 export function createPong(root){
   const canvas = document.createElement('canvas');
   canvas.width = 680; canvas.height = 360;
@@ -13,9 +15,17 @@ export function createPong(root){
   const leftScoreEl  = root.querySelector('#pongLeft');
   const rightScoreEl = root.querySelector('#pongRight');
   const hintEl       = root.querySelector('#pongHint');
+  const diffSel      = root.querySelector('#pongDiff');
+  const cumYouEl     = root.querySelector('#pongCumYou');
+  const cumCpuEl     = root.querySelector('#pongCumCpu');
 
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
+
+  const saved = load('pong:save', { diff:'normal', cumYou:0, cumCpu:0 });
+  diffSel.value = saved.diff ?? 'normal';
+  let cumYou = saved.cumYou || 0, cumCpu = saved.cumCpu || 0;
+  cumYouEl.textContent = cumYou; cumCpuEl.textContent = cumCpu;
 
   // gameplay
   let running=false, raf=0, last=0;
@@ -25,10 +35,17 @@ export function createPong(root){
   let keys = {};
   let leftScore=0, rightScore=0;
 
+  function aiMaxSpeed(){
+    if(diffSel.value==='easy') return 170;
+    if(diffSel.value==='hard') return 280;
+    return 220;
+  }
+
   function resetBall(dir = (Math.random()<.5?-1:1)){
     ball.x = W/2; ball.y = H/2;
-    ball.vx = 220 * dir;
-    ball.vy = (Math.random()*2-1) * 160;
+    const speed = diffSel.value==='hard' ? 260 : diffSel.value==='easy' ? 200 : 220;
+    ball.vx = speed * dir;
+    ball.vy = (Math.random()*2-1) * (speed*0.75);
   }
 
   function update(dt){
@@ -39,32 +56,29 @@ export function createPong(root){
     left.y += left.vy * dt;
     left.y = Math.max(0, Math.min(H-left.h, left.y));
 
-    // simple AI: track ball with reaction lag
+    // AI
     const target = ball.y - right.h/2;
     const diff = target - right.y;
-    const maxSpeed = 220;
+    const maxSpeed = aiMaxSpeed();
     right.vy = Math.max(-maxSpeed, Math.min(maxSpeed, diff * 6 * dt));
     right.y += right.vy;
     right.y = Math.max(0, Math.min(H-right.h, right.y));
 
-    // move ball
+    // ball
     ball.x += ball.vx * dt;
     ball.y += ball.vy * dt;
 
-    // wall bounce
+    // walls
     if(ball.y - ball.r < 0){ ball.y = ball.r; ball.vy *= -1; }
     if(ball.y + ball.r > H){ ball.y = H - ball.r; ball.vy *= -1; }
 
-    // paddle collisions
-    // left
+    // paddles
     if(ball.x - ball.r < left.x + left.w && ball.y > left.y && ball.y < left.y + left.h){
       ball.x = left.x + left.w + ball.r;
-      // add angle based on hit position
       const hit = (ball.y - (left.y + left.h/2)) / (left.h/2);
-      ball.vx = Math.abs(ball.vx) * (1 + Math.random()*0.1); // speed up slightly
+      ball.vx = Math.abs(ball.vx) * (1 + Math.random()*0.1);
       ball.vy = hit * 230;
     }
-    // right
     if(ball.x + ball.r > right.x && ball.y > right.y && ball.y < right.y + right.h){
       ball.x = right.x - ball.r;
       const hit = (ball.y - (right.y + right.h/2)) / (right.h/2);
@@ -73,24 +87,22 @@ export function createPong(root){
     }
 
     // scoring
-    if(ball.x < -10){ rightScore++; rightScoreEl.textContent = rightScore; resetBall(1); }
-    if(ball.x > W+10){ leftScore++;  leftScoreEl.textContent  = leftScore;  resetBall(-1); }
+    if(ball.x < -10){ rightScore++; rightScoreEl.textContent = rightScore; cumCpu++; saveState(); resetBall(1); }
+    if(ball.x > W+10){ leftScore++;  leftScoreEl.textContent  = leftScore;  cumYou++; saveState(); resetBall(-1); }
+  }
+
+  function saveState(){
+    cumYouEl.textContent = cumYou; cumCpuEl.textContent = cumCpu;
+    save('pong:save', { diff: diffSel.value, cumYou, cumCpu });
   }
 
   function draw(){
     ctx.clearRect(0,0,W,H);
-    // center dashed line
     ctx.globalAlpha=0.4;
-    for(let y=10; y<H; y+=18){
-      ctx.fillRect(W/2-1, y, 2, 10);
-    }
+    for(let y=10; y<H; y+=18){ ctx.fillRect(W/2-1, y, 2, 10); }
     ctx.globalAlpha=1;
-
-    // paddles
     ctx.fillRect(left.x, left.y, left.w, left.h);
     ctx.fillRect(right.x, right.y, right.w, right.h);
-
-    // ball
     ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fill();
   }
 
@@ -125,6 +137,7 @@ export function createPong(root){
   }
   window.addEventListener('keydown', e=>onKey(e,true));
   window.addEventListener('keyup',   e=>onKey(e,false));
+  diffSel.addEventListener('change', ()=>{ saveState(); reset(); });
 
   reset();
   return { reset, start, stop };
