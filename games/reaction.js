@@ -1,3 +1,5 @@
+import { load, save } from '../utils/store.js';
+
 export function createReaction(root){
   const box    = root.querySelector('#reactBox');
   const label  = root.querySelector('#reactLabel');
@@ -7,7 +9,10 @@ export function createReaction(root){
   const bestEl = root.querySelector('#reactBest');
 
   let state = 'idle'; // idle -> waiting -> go
-  let timer = null, goTime=0, best=null;
+  let timer = null, goTime=0;
+  let best = load('reaction:best', null);
+
+  bestEl.textContent = best ?? '—';
 
   function start(){
     clearTimeout(timer);
@@ -29,7 +34,7 @@ export function createReaction(root){
     } else if(state==='go'){
       const t = Math.round(performance.now()-goTime);
       lastEl.textContent=t;
-      if(best===null || t<best){ best = t; bestEl.textContent=best; }
+      if(best==null || t<best){ best = t; bestEl.textContent=best; save('reaction:best', best); }
       status.textContent='Nice! Press Start to try again.';
       resetBox();
     }
