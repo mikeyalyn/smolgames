@@ -116,6 +116,36 @@
             </div>
           </div>
         </section>
+
+        <!-- Pong -->
+<section class="game" id="game-pong" data-key="pong">
+  <h2>Pong 🏓</h2>
+  <div class="panel center">
+    <div class="flex" style="justify-content:center">
+      <span class="stat">You: <b id="pongLeft">0</b></span>
+      <span class="stat">CPU: <b id="pongRight">0</b></span>
+    </div>
+    <div class="spacer"></div>
+    <!-- canvas is injected here by pong.js -->
+    <div class="spacer"></div>
+    <div class="hint" id="pongHint">Use W/S or ↑/↓ to move</div>
+  </div>
+</section>
+
+<!-- Maze Runner -->
+<section class="game" id="game-maze" data-key="maze">
+  <h2>Maze Runner 🧭</h2>
+  <div class="panel center">
+    <div class="flex" style="justify-content:center">
+      <span class="stat">Moves: <b id="mazeMoves">0</b></span>
+      <span class="stat">Size: <b id="mazeSize">—</b></span>
+    </div>
+    <div class="spacer"></div>
+    <!-- canvas is injected here by maze.js -->
+    <div class="spacer"></div>
+    <div class="hint">Use WASD or arrow keys to find the exit (green square).</div>
+  </div>
+</section>
       </main>
     </div>
   </div>
@@ -123,3 +153,4 @@
   <script type="module" src="./main.js"></script>
 </body>
 </html>
+
