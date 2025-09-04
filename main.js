@@ -3,8 +3,9 @@ import { createClicker }  from './games/clicker.js';
 import { createMemory }   from './games/memory.js';
 import { createCatch }    from './games/catch.js';
 import { createRps }      from './games/rps.js';
-import { createPong } from './games/pong.js';
-import { createMaze } from './games/maze.js';
+import { createPong }     from './games/pong.js';
+import { createMaze }     from './games/maze.js';
+import { wipeAll }        from './utils/store.js';
 
 const GAMES = [
   { key:'reaction', name:'Reaction Test ⚡', desc:'Wait for green, then click fast!', mount:'#game-reaction', factory:createReaction },
@@ -16,9 +17,10 @@ const GAMES = [
   { key:'maze'    , name:'Maze Runner 🧭', desc:'Generate & escape a maze.', mount:'#game-maze', factory:createMaze }
 ];
 
-const menu   = document.getElementById('menu');
+const menu     = document.getElementById('menu');
 const backBtn  = document.getElementById('backBtn');
 const resetBtn = document.getElementById('resetBtn');
+const wipeBtn  = document.getElementById('wipeSavesBtn');
 
 let instances = {};
 let currentKey = null;
@@ -47,7 +49,7 @@ function setActiveSection(key){
 
 function navigate(key){
   if (currentKey && instances[currentKey]?.stop) {
-    instances[currentKey].stop(); // let games pause if needed
+    instances[currentKey].stop();
   }
   currentKey = key;
   setActiveSection(key);
@@ -58,8 +60,7 @@ function navigate(key){
     const root = document.querySelector(def.mount);
     instances[key] = def.factory(root);
   }
-  // ensure game is ready
-  if (instances[key]?.start) instances[key].start();
+  instances[key]?.start?.();
 }
 
 function goMenu(){
@@ -78,7 +79,7 @@ backBtn.addEventListener('click', goMenu);
 resetBtn.addEventListener('click', resetCurrent);
 window.addEventListener('keydown', e=>{ if(e.key==='Escape') goMenu(); });
 
-// Visibility: allow games that animate to pause
+// Pause/resume animating games when tab hidden
 document.addEventListener('visibilitychange', ()=>{
   if (!currentKey) return;
   const inst = instances[currentKey];
@@ -87,7 +88,10 @@ document.addEventListener('visibilitychange', ()=>{
   else inst.stop?.();
 });
 
+// Wipe all saves
+wipeBtn.addEventListener('click', ()=>{
+  if(confirm('Delete all Tiny Arcade saves?')){ wipeAll(); alert('All saves cleared.'); }
+});
+
 renderMenu();
 goMenu();
-
-
