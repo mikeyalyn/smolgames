@@ -1,10 +1,15 @@
+import { load, save } from '../utils/store.js';
+
 export function createMemory(root){
   const boardEl  = root.querySelector('#memBoard');
   const movesEl  = root.querySelector('#memMoves');
   const matchesEl= root.querySelector('#memMatches');
+  const bestEl   = root.querySelector('#memBest');
 
   const EMO = ['🦋','🍓','⭐','🌙','🍀','🔥','💎','🎈'];
   let deck=[], first=null, lock=false, moves=0, matches=0;
+  let best = load('memory:best', null);
+  bestEl.textContent = best ?? '—';
 
   function makeDeck(){
     const pool = [...EMO, ...EMO]; // 16 cards (8 pairs)
@@ -36,6 +41,9 @@ export function createMemory(root){
     if(first.v===c.v){
       c.matched=true; first.matched=true; matches++;
       first=null; render();
+      if(matches===8){
+        if(best==null || moves<best){ best=moves; bestEl.textContent=best; save('memory:best', best); }
+      }
     }else{
       lock=true;
       setTimeout(()=>{
