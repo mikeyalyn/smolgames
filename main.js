@@ -11,7 +11,9 @@ const GAMES = [
   { key:'clicker' , name:'Clicker 🐾', desc:'Tap for points, buy tiny upgrades.', mount:'#game-clicker', factory:createClicker },
   { key:'memory'  , name:'Memory Match 🧠', desc:'Flip cards and match pairs.', mount:'#game-memory', factory:createMemory },
   { key:'catch'   , name:'Catch 🧺', desc:'Catch drops. Don’t miss 3!', mount:'#game-catch', factory:createCatch },
-  { key:'rps'     , name:'Rock · Paper · Scissors ✂️', desc:'Classic best-of ∞.', mount:'#game-rps', factory:createRps }
+  { key:'rps'     , name:'Rock · Paper · Scissors ✂️', desc:'Classic best-of ∞.', mount:'#game-rps', factory:createRps },
+  { key:'pong'    , name:'Pong 🏓', desc:'Classic paddle duel vs CPU.', mount:'#game-pong', factory:createPong },
+  { key:'maze'    , name:'Maze Runner 🧭', desc:'Generate & escape a maze.', mount:'#game-maze', factory:createMaze }
 ];
 
 const menu   = document.getElementById('menu');
@@ -87,4 +89,5 @@ document.addEventListener('visibilitychange', ()=>{
 
 renderMenu();
 goMenu();
+
 
