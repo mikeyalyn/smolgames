@@ -3,6 +3,8 @@ import { createClicker }  from './games/clicker.js';
 import { createMemory }   from './games/memory.js';
 import { createCatch }    from './games/catch.js';
 import { createRps }      from './games/rps.js';
+import { createPong } from './games/pong.js';
+import { createMaze } from './games/maze.js';
 
 const GAMES = [
   { key:'reaction', name:'Reaction Test ⚡', desc:'Wait for green, then click fast!', mount:'#game-reaction', factory:createReaction },
@@ -85,3 +87,4 @@ document.addEventListener('visibilitychange', ()=>{
 
 renderMenu();
 goMenu();
+
